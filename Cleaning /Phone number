@@ -1,0 +1,20 @@
+-- Request to analyse the phone numbers prefixs 
+WITH phone_tab AS (
+  SELECT
+  Phone, --replace with phone by the phone field name
+  REGEXP_REPLACE(REGEXP_REPLACE(SUBSTR(phone, 1, 5), '[1-9]', '#'), '[a-zA-Z]', 'L') AS phone_prefix_format, --replace with phone by the phone field name
+  COUNT(phone)OVER() AS nb_total_phone
+  FROM
+  landing_layer.legacy_crm_contact
+)
+-- Analyse des préfixes
+SELECT
+  phone_prefix_format,
+  COUNT(*) AS nb_occur,
+  MAX(nb_total_phone) AS nb_total_phone,
+  100*COUNT(*) / MAX(nb_total_phone) AS percent_format
+FROM 
+  phone_tab
+GROUP BY
+  phone_prefix_format
+ORDER BY nb_occur DESC
